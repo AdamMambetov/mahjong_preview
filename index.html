@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns='http://www.w3.org/1999/xhtml' lang='' xml:lang=''>
+<html xmlns='https://www.w3.org/1999/xhtml' lang='' xml:lang=''>
 <head>
 	<meta charset='utf-8' />
 	<!-- <meta name='viewport' content='width=device-width, user-scalable=no' /> remove mobile version -->
@@ -139,8 +139,9 @@
 	<script type='text/javascript' src='index.js'></script>
 	<script type='text/javascript'>//<![CDATA[
 
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":32716048,"index.wasm":13790961},"focusCanvas":true,"gdnativeLibs":[]};
+		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":32716064,"index.wasm":13790961},"focusCanvas":true,"gdnativeLibs":[]};
 		var engine = new Engine(GODOT_CONFIG);
+		var xgl = null;
 
 		(function() {
 			const INDETERMINATE_STATUS_STEP_MS = 100;
@@ -221,6 +222,33 @@
 				displayFailureNotice('WebGL not available');
 			} else {
 				setStatusMode('indeterminate');
+
+///adding this block to fix low fps and low context
+				var wopts = { 
+				alpha: false,
+antialias: false,
+depth: true,
+desynchronized: false,
+failIfMajorPerformanceCaveat: false,
+powerPreference: "default",
+premultipliedAlpha: true,
+preserveDrawingBuffer: false,
+stencil: false,
+xrCompatible: false
+				   };
+				if (Engine.isWebGLAvailable(2)) {
+				document.getElementById('canvas').getContext('webgl2',wopts);//fix lost context and low fps
+				} else {
+				document.getElementById('canvas').getContext('webgl',wopts);//fix lost context and low fps
+				}
+				
+				
+///
+				
+				
+				
+				
+				
 				engine.startGame({
 					'onProgress': function (current, total) {
 						if (total > 0) {
@@ -239,7 +267,26 @@
 				}).then(() => {
 					setStatusMode('hidden');
 					initializing = false;
+					
+					
+					
+					
+	//console.log(document.getElementById('canvas').getContext('webgl').getContextAttributes());	
+					
+								
+
+					
+					
+					
 				}, displayFailureNotice);
+			
+			
+			
+
+			
+			
+			
+			
 			}
 		})();
 	//]]></script>
