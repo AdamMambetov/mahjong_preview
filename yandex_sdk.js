@@ -15,7 +15,7 @@ function InitGame(params, callback) {
     });
 }
 
-var lb;
+let lb;
 function InitLeaderboard(callback) {
     console.log("Leaderboard start initialization");
     ysdk.getLeaderboards()
@@ -29,6 +29,85 @@ function InitLeaderboard(callback) {
         console.log('Leaderboard initialization error');
     });
 
+}
+
+let payments;
+function InitPayments(full, callback) {
+    ysdk.getPayments({ signed: full }).then(_payments => {
+        payments = _payments
+        console.log("Payments initialized")
+        callback()
+    }).catch(err => {
+        console.log('Payments initialization error')
+        console.log(err)
+    })
+}
+
+let player;
+function InitPlayer(full, callback) {
+    console.log('Player start initialisation');
+    ysdk.getPlayer({ signed: full }).then(_player => {
+        player = _player;
+        console.log('Player initialized');
+        
+        callback();
+     }).catch(err => {
+        console.log(err);
+        console.log('Player initialization error');
+    });
+}
+
+function GetPurchases(full, callback) {
+    ysdk.getPurchases({ signed: full }).then(purchases => {
+        console.log('Purchases:')
+        console.log(purchases)
+        callback("success", purchases)
+    }).catch(err => {
+        console.log('GetPurchases error')
+        console.log(err)
+        callback("error")
+    })
+}
+
+function Purchase(id, callback) {
+    payments.purchase({ "id": id }).then(purchase => {
+        console.log("Purchase:")
+        console.log(purchase)
+        callback("success", purchase)
+    }).catch(err => {
+        console.log('Purchase error')
+        console.log(err)
+        callback("error")
+    })
+}
+
+function ConsumePurchases(callback) {
+    payments.getPurchases().then(purchases => purchases.forEach((purchase) => {
+        switch (purchase.productID) {
+            case "coins100":
+                player.incrementStats({ "money": 100 }).then(() => {
+                    payments.consumePurchase(purchase.purchaseToken)
+                })
+                break
+            case "clue5":
+                player.getData([]).then(data => {
+                    data.items.clue = data.items.clue + 5
+                    player.setData(data).then(() => {
+                        payments.consumePurchase(purchase.purchaseToken)
+                    })
+                })
+                break
+            case "cancel5":
+                player.getData([]).then(data => {
+                    data.items.cancel_move = data.items.cancel_move + 5
+                    player.setData(data).then(() => {
+                        payments.consumePurchase(purchase.purchaseToken)
+                    })
+                })
+                break
+        }
+    }))
+    callback()
 }
 
 function GetLeaderboardDescription(leaderboardName, callback) {
@@ -82,7 +161,6 @@ function LoadLeaderboardPlayerEntry(leaderboardName, callback) {
   });
 }
 
-
 function LoadLeaderboardEntries(leaderboardName, includeUser, quantityAround, quantityTop, callback) {
   lb.getLeaderboardEntries(leaderboardName, {
     includeUser: includeUser,
@@ -101,20 +179,6 @@ function LoadLeaderboardEntries(leaderboardName, includeUser, quantityAround, qu
     }
     callback("error");
   });
-}
-
-let player;
-function InitPlayer(full, callback) {
-    console.log('Player start initialisation');
-    ysdk.getPlayer(full).then(_player => {
-        player = _player;
-        console.log('Player initialized');
-        
-        callback();
-     }).catch(err => {
-        console.log(err);
-        console.log('Player initialization error');
-    });
 }
 
 function OpenAuthDialog() {
@@ -216,4 +280,8 @@ function LoadStats(keys, callback) {
             callback("error");
         }
     );
+}
+
+function GetLang() {
+    return ysdk.environment.i18n.lang
 }
