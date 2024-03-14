@@ -9,9 +9,8 @@ function InitGame(params, callback) {
         console.log('Game initialized');
         
         callback();
-    }).catch(err => {
-        console.log(err);
-        console.log('Game initialization error');
+    }).catch(e => {
+        console.error('Game initialization error: ', e);
     });
 }
 
@@ -24,9 +23,8 @@ function InitLeaderboard(callback) {
         console.log("Leaderboard initialized");
     
         callback()
-    }).catch(err => {
-        console.log(err);
-        console.log('Leaderboard initialization error');
+    }).catch(e => {
+        console.log('Leaderboard initialization error: ', e);
     });
 
 }
@@ -37,9 +35,8 @@ function InitPayments(full, callback) {
         payments = _payments
         console.log("Payments initialized")
         callback()
-    }).catch(err => {
-        console.log('Payments initialization error')
-        console.log(err)
+    }).catch(e => {
+        console.error('Payments initialization error: ', e)
     })
 }
 
@@ -49,34 +46,39 @@ function InitPlayer(full, callback) {
     ysdk.getPlayer({ signed: full }).then(_player => {
         player = _player;
         console.log('Player initialized');
-        
         callback();
-     }).catch(err => {
-        console.log(err);
-        console.log('Player initialization error');
+     }).catch(e => {
+        console.error('Player initialization error: ', e);
     });
+}
+
+function GetFlags(callback) {
+    ysdk.getFlags().then(flags => {
+        console.log('Flags: ', flags)
+        callback("success", flags)
+    })
+    .catch(e => {
+        console.error('GetFlags error: ', e)
+        callback("error")
+    })
 }
 
 function GetPurchases(full, callback) {
     ysdk.getPurchases({ signed: full }).then(purchases => {
-        console.log('Purchases:')
-        console.log(purchases)
+        console.log('Purchases: ', purchases)
         callback("success", purchases)
-    }).catch(err => {
-        console.log('GetPurchases error')
-        console.log(err)
+    }).catch(e => {
+        console.error('GetPurchases error: ', e)
         callback("error")
     })
 }
 
 function Purchase(id, callback) {
     payments.purchase({ "id": id }).then(purchase => {
-        console.log("Purchase:")
-        console.log(purchase)
+        console.log("Purchase: ", purchase)
         callback("success", purchase)
-    }).catch(err => {
-        console.log('Purchase error')
-        console.log(err)
+    }).catch(e => {
+        console.error('Purchase error: ', e)
         callback("error")
     })
 }
@@ -113,12 +115,11 @@ function ConsumePurchases(callback) {
 function GetLeaderboardDescription(leaderboardName, callback) {
   lb.getLeaderboardDescription(leaderboardName).then(
       result => {
-      console.log("Leaderboard description:");
-      console.log(result);
+      console.log("Leaderboard description: ", result);
       callback("loaded", result);
     },
       error => {
-          console.log('Leaderboard description load error');
+          console.error('Leaderboard description load error');
           callback("error");
       }
   );
@@ -132,7 +133,7 @@ function CheckAuth(callback) {
         callback(result);
       },
       error => {
-          console.log("isAvailableMethod setLeaderboardScore error");
+          console.error("isAvailableMethod setLeaderboardScore error");
           callback(false);
       }
     );
@@ -153,10 +154,10 @@ function LoadLeaderboardPlayerEntry(leaderboardName, callback) {
     })
   .catch(err => {
     if (err.code === 'LEADERBOARD_PLAYER_NOT_PRESENT') {
-      console.log("У игрока нет записи в лидерборде");
+      console.error("У игрока нет записи в лидерборде");
     }
     else
-      console.log(err);
+      console.error(err);
     callback("error")
   });
 }
@@ -171,11 +172,11 @@ function LoadLeaderboardEntries(leaderboardName, includeUser, quantityAround, qu
     console.log("Loaded leaderboard entries:", res);
     callback("loaded", res);
   })
-  .catch(err => {
-    if (err.code === 'LEADERBOARD_NOT_FOUND') {
-      console.log("Лидерборд не найден.");
+  .catch(e => {
+    if (e.code === 'LEADERBOARD_NOT_FOUND') {
+      console.error("Лидерборд не найден.");
     } else {
-      console.log(err);
+      console.error(e);
     }
     callback("error");
   });
@@ -186,11 +187,13 @@ function OpenAuthDialog() {
             // Игрок не авторизован.
             ysdk.auth.openAuthDialog().then(() => {
                     // Игрок успешно авторизован
-                    player.catch(err => {
+                    player.catch(e => {
                         // Ошибка при инициализации объекта Player.
+                        console.error("Ошибка при инициализации объекта Player ", e)
                     });
                 }).catch(() => {
                     // Игрок не авторизован.
+                    console.error("Игрок не авторизован")
                 });
         }
 }
@@ -205,7 +208,7 @@ function ShowAd(callback) {
             },
             onError: function(error) {
                 callback('error')
-                console.log('Ad error');
+                console.error('Ad error: ', error);
             }
         }
     })
@@ -230,7 +233,7 @@ function ShowAdRewardedVideo(callback) {
             }, 
             onError: (e) => {
                 callback("error")
-                console.log('Error while open rewarded video ad:', e);
+                console.error('Error while open rewarded video ad:', e);
             }
         }
     })
@@ -261,7 +264,7 @@ function LoadData(keys, callback) {
             callback("loaded", result);
         },
         error => {
-            console.log('Data load error');
+            console.error('Data load error');
             callback("error");
         }
     );
@@ -276,7 +279,7 @@ function LoadStats(keys, callback) {
             callback("loaded", result);
         },
         error => {
-            console.log('Stats load error');
+            console.error('Stats load error');
             callback("error");
         }
     );
