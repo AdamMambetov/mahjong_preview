@@ -288,3 +288,7 @@ function LoadStats(keys, callback) {
 function GetLang() {
     return ysdk.environment.i18n.lang
 }
+
+function IsArray(value) {
+    return Array.isArray(value)
+}
