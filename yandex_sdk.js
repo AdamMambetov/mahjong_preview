@@ -52,6 +52,16 @@ function InitPlayer(full, callback) {
     });
 }
 
+function IsDesktop() {
+    return ysdk.deviceInfo.isDesktop()
+}
+
+function ConnectToTabEvents(focusedCallback, switchedCallback) {
+    console.log("ConnectToTabEvents")
+    window.addEventListener('blur', switchedCallback)
+    window.addEventListener('focus', focusedCallback)
+}
+
 function GetFlags(callback) {
     ysdk.getFlags().then(flags => {
         console.log('Flags: ', flags)
