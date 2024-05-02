@@ -74,7 +74,7 @@ function GetFlags(callback) {
 }
 
 function GetPurchases(full, callback) {
-    ysdk.getPurchases({ signed: full }).then(purchases => {
+    payments.getPurchases({ signed: full }).then(purchases => {
         console.log('Purchases: ', purchases)
         callback("success", purchases)
     }).catch(e => {
@@ -93,33 +93,9 @@ function Purchase(id, callback) {
     })
 }
 
-function ConsumePurchases(callback) {
-    payments.getPurchases().then(purchases => purchases.forEach((purchase) => {
-        switch (purchase.productID) {
-            case "coins100":
-                player.incrementStats({ "money": 100 }).then(() => {
-                    payments.consumePurchase(purchase.purchaseToken)
-                })
-                break
-            case "clue5":
-                player.getData([]).then(data => {
-                    data.items.clue = data.items.clue + 5
-                    player.setData(data).then(() => {
-                        payments.consumePurchase(purchase.purchaseToken)
-                    })
-                })
-                break
-            case "cancel5":
-                player.getData([]).then(data => {
-                    data.items.cancel_move = data.items.cancel_move + 5
-                    player.setData(data).then(() => {
-                        payments.consumePurchase(purchase.purchaseToken)
-                    })
-                })
-                break
-        }
-    }))
-    callback()
+function ConsumePurchase(purchaseToken) {
+    console.log("consume purchase: ", purchaseToken)
+    payments.consumePurchase(purchaseToken)
 }
 
 function GetLeaderboardDescription(leaderboardName, callback) {
@@ -139,7 +115,6 @@ function CheckAuth(callback) {
     ysdk.isAvailableMethod('leaderboards.setLeaderboardScore')
       .then(
       result => {
-        console.log(result);
         callback(result);
       },
       error => {
@@ -193,19 +168,17 @@ function LoadLeaderboardEntries(leaderboardName, includeUser, quantityAround, qu
 }
 
 function OpenAuthDialog() {
-  if (player.getMode() === 'lite') {
-            // Игрок не авторизован.
-            ysdk.auth.openAuthDialog().then(() => {
-                    // Игрок успешно авторизован
-                    player.catch(e => {
-                        // Ошибка при инициализации объекта Player.
-                        console.error("Ошибка при инициализации объекта Player ", e)
-                    });
-                }).catch(() => {
-                    // Игрок не авторизован.
-                    console.error("Игрок не авторизован")
-                });
-        }
+    if (player.getMode() === 'lite') {
+        // Игрок не авторизован.
+        ysdk.auth.openAuthDialog().then(() => {
+            console.log("Игрок успешно авторизован")
+            player.catch(e => {
+                console.error("Ошибка при инициализации объекта Player ", e)
+            });
+        }).catch(() => {
+            console.error("Игрок не авторизован")
+        });
+    }
 }
 
 function ShowAd(callback) {
