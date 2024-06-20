@@ -56,6 +56,10 @@ function IsDesktop() {
     return ysdk.deviceInfo.isDesktop()
 }
 
+function IsArray(value) {
+    return Array.isArray(value)
+}
+
 function ConnectToTabEvents(focusedCallback, switchedCallback) {
     console.log("ConnectToTabEvents")
     window.addEventListener('blur', switchedCallback)
@@ -81,6 +85,21 @@ function GetPurchases(full, callback) {
         console.error('GetPurchases error: ', e)
         callback("error")
     })
+}
+
+function GetCatalog(callback) {
+    payments.getCatalog().then(products => {
+        console.log("Products: ", products)
+        callback("success", products)
+    })
+    .catch(e => {
+        console.error('GetCatalog error: ', e)
+        callback("error")
+    })
+}
+
+function GetLang() {
+    return ysdk.environment.i18n.lang
 }
 
 function Purchase(id, callback) {
@@ -266,12 +285,4 @@ function LoadStats(keys, callback) {
             callback("error");
         }
     );
-}
-
-function GetLang() {
-    return ysdk.environment.i18n.lang
-}
-
-function IsArray(value) {
-    return Array.isArray(value)
 }
