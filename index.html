@@ -5,7 +5,6 @@
     <meta name='viewport' content='width=device-width, user-scalable=no' />
     <title>Mahjong</title>
     <style type='text/css'>
-
         body {
             touch-action: none;
             margin: 0;
@@ -123,10 +122,10 @@
 <link id='-gd-engine-icon' rel='icon' type='image/png' href='index.icon.png' />
 <link rel='apple-touch-icon' href='index.apple-touch-icon.png'/>
 <script type="text/javascript">
-  function IsArray(value) {
-    console.log(value);
-    return Array.isArray(value);
-  }
+	function IsArray(value) {
+		console.log(value);
+		return Array.isArray(value);
+	}
 </script>
 </head>
 <body>
@@ -152,8 +151,7 @@
     <script type="text/javascript" src="./instant-games-bridge.js"></script>
     <script type='text/javascript' src='index.js'></script>
     <script type='text/javascript'>//<![CDATA[
-
-        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":41216208,"index.wasm":13790961},"focusCanvas":true,"gdnativeLibs":[]};
+        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":41242912,"index.wasm":13790961},"focusCanvas":true,"gdnativeLibs":[]};
         var engine = new Engine(GODOT_CONFIG);
 
         (function() {
@@ -174,7 +172,6 @@
             requestAnimationFrame(animate);
 
             function setStatusMode(mode) {
-
                 if (statusMode === mode || !initializing)
                     return;
                 [statusProgress, statusIndeterminate, statusNotice].forEach(elem => {
@@ -249,9 +246,14 @@
                 
                 bridge.initialize(bridgeOptions).then(() => {
                     let bannerContainer = document.getElementById('banner-container')
-                    bridge.advertisement.on(bridge.EVENT_NAME.BANNER_STATE_CHANGED, state => {
-                        bannerContainer.style.display = state === 'loading' || state === 'shown' ? 'block' : 'none'
-                    })
+
+                    if (bridge.platform.id === bridge.PLATFORM_ID.CRAZY_GAMES || bridge.platform.id === bridge.PLATFORM_ID.GAME_DISTRIBUTION) {
+                        bridge.advertisement.on(bridge.EVENT_NAME.BANNER_STATE_CHANGED, state => {
+                            bannerContainer.style.display = state === 'loading' || state === 'shown' ? 'block' : 'none'
+                        })
+                    } else {
+                        bannerContainer.style.display = 'none'
+                    }
 
                     engine.startGame({
                     'onProgress': function (current, total) {
@@ -278,6 +280,7 @@
     //]]></script>
 </body>
 </html>
+
                     }).then(() => {
                         setStatusMode('hidden');
                         initializing = false;
